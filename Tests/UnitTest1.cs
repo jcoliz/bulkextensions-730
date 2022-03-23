@@ -1,4 +1,5 @@
 using bulkextensions_730.Data;
+using EFCore.BulkExtensions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -29,6 +30,8 @@ public class UnitTest1
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseSqlite(connection)
             .Options;
+
+        SQLitePCL.Batteries.Init();
 
         context = new ApplicationDbContext(options);
         await context.Database.EnsureCreatedAsync();
@@ -121,6 +124,26 @@ public class UnitTest1
         // When: Adding them to the database
         context.Set<Parent>().AddRange(parents);
         context.SaveChanges();
+
+        // Then: They are in the database
+        var actual = context.Set<Parent>().Count();
+        Assert.AreEqual(count,actual);
+
+        // And: The children are separately in the database as well
+        var childrencount = context.Set<Child>().Count();
+        Assert.AreEqual(numchildren,childrencount);
+    }
+
+    [TestMethod]
+    public void BulkAddParentsWithChildren()
+    {
+        // Given: A set of parents with varying number of children
+        var count = 25;
+        var parents = GivenParentsWithChildren(count).ToList();
+        var numchildren = parents.Sum(x=>x.Children.Count);
+
+        // When: Adding them to the database (using bulk extensions)
+        context.BulkInsert(parents,b => b.IncludeGraph = true);
 
         // Then: They are in the database
         var actual = context.Set<Parent>().Count();
