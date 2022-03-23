@@ -38,10 +38,10 @@ This uses a pair of entities, a Parent which contains multiple Children. See the
         var numchildren = parents.Sum(x=>x.Children.Count);
 ```
 
-### When: Adding them 
+### When: Adding the parents (with contained children)
 
 ```C#
-        // When: Adding them to the database (using bulk extensions)
+        // When: Adding the parents to the database (using bulk extensions)
         context.BulkInsert(parents,b => b.IncludeGraph = true);
 ```
 

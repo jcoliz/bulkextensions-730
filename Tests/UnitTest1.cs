@@ -121,11 +121,11 @@ public class UnitTest1
         var count = 25;
         var parents = GivenParents(count);
 
-        // When: Adding them to the database
+        // When: Adding the parents to the database
         context.Set<Parent>().AddRange(parents);
         context.SaveChanges();
 
-        // Then: They are in the database
+        // Then: The parents are in the database
         var actual = context.Set<Parent>().Count();
         Assert.AreEqual(count,actual);
     }
@@ -138,11 +138,11 @@ public class UnitTest1
         var parents = GivenParentsWithChildren(count);
         var numchildren = parents.Sum(x=>x.Children.Count);
 
-        // When: Adding them to the database
+        // When: Adding the parents to the database
         context.Set<Parent>().AddRange(parents);
         context.SaveChanges();
 
-        // Then: They are in the database
+        // Then: The parents are in the database
         var actual = context.Set<Parent>().Count();
         Assert.AreEqual(count,actual);
 
@@ -160,10 +160,10 @@ public class UnitTest1
         var parents = GivenParentsWithChildren(count).ToList();
         var numchildren = parents.Sum(x=>x.Children.Count);
 
-        // When: Adding them to the database (using bulk extensions)
+        // When: Adding the parents to the database (using bulk extensions)
         context.BulkInsert(parents,b => b.IncludeGraph = true);
 
-        // Then: They are in the database
+        // Then: The parents are in the database
         var actual = context.Set<Parent>().Count();
         Assert.AreEqual(count,actual);
 
@@ -181,10 +181,10 @@ public class UnitTest1
         var parents = GivenParentsWithUniqueChildren(count).ToList();
         var numchildren = parents.Sum(x=>x.Children.Count);
 
-        // When: Adding them to the database (using bulk extensions)
+        // When: Adding the parents to the database (using bulk extensions)
         context.BulkInsert(parents,b => b.IncludeGraph = true);
 
-        // Then: They are in the database
+        // Then: The parents are in the database
         var actual = context.Set<Parent>().Count();
         Assert.AreEqual(count,actual);
 
