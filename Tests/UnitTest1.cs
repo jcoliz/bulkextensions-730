@@ -31,8 +31,6 @@ public class UnitTest1
             .UseSqlite(connection)
             .Options;
 
-        SQLitePCL.Batteries.Init();
-
         context = new ApplicationDbContext(options);
         await context.Database.EnsureCreatedAsync();
     }
