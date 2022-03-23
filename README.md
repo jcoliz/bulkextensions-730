@@ -79,7 +79,6 @@ Cloning into 'bulkextensions-730'...
 remote: Enumerating objects: 64, done.
 remote: Counting objects: 100% (64/64), done.
 remote: Compressing objects: 100% (30/30), done.
-Receiving objects:  28% (18/64)used 64 (delta 24), pack-reused 0 eceiving objects:  25% (16/64)
 Receiving objects: 100% (64/64), 21.12 KiB | 322.00 KiB/s, done.
 Resolving deltas: 100% (24/24), done.
 
