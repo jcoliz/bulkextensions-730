@@ -151,7 +151,7 @@ public class UnitTest1
         Assert.AreEqual(numchildren,childrencount);
     }
 
-    [TestMethod]
+    [TestMethod, Priority(2)]
     public void BulkAddParentsWithChildren()
     {
         // Given: A set of parents with varying number of children, where some children
@@ -172,7 +172,7 @@ public class UnitTest1
         Assert.AreEqual(numchildren,childrencount);
     }
 
-    [TestMethod]
+    [TestMethod, Priority(1)]
     public void BulkAddParentsWithUniqueChildren()
     {
         // Given: A set of parents with varying number of children, where some children
