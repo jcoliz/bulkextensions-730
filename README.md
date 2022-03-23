@@ -2,6 +2,8 @@
 
 This is a repro for [Issue #730](https://github.com/borisdj/EFCore.BulkExtensions/issues/780) on [EFCore.BulkExtensions](https://github.com/borisdj/EFCore.BulkExtensions)
 
+[![Build](https://github.com/jcoliz/bulkextensions-730/actions/workflows/build.yml/badge.svg)](https://github.com/jcoliz/bulkextensions-730/actions/workflows/build.yml)
+
 ## Issue Description
 
 ### Given: A set of parent entities with varying number of children entities, where some children are equal to other children 
