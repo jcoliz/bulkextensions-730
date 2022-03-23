@@ -96,7 +96,7 @@ public class UnitTest1
 
     #region Tests
 
-    [TestMethod]
+    [TestMethod, Priority(1)]
     public void ChildEquals()
     {
         var one = new Child() { ID = 1, Name = "Samir", Age = 12 };
@@ -105,7 +105,7 @@ public class UnitTest1
         Assert.AreEqual(one,two);
     }
 
-    [TestMethod]
+    [TestMethod, Priority(1)]
     public void ChildNotEquals()
     {
         var one = new Child() { ID = 1, Name = "Samir", Age = 12 };
@@ -114,7 +114,7 @@ public class UnitTest1
         Assert.AreNotEqual(one,two);
     }
 
-    [TestMethod]
+    [TestMethod, Priority(1)]
     public void AddParents()
     {
         // Given: A set of parents
@@ -130,7 +130,7 @@ public class UnitTest1
         Assert.AreEqual(count,actual);
     }
 
-    [TestMethod]
+    [TestMethod, Priority(1)]
     public void AddParentsWithChildren()
     {
         // Given: A set of parents with varying number of children
