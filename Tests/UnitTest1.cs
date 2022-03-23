@@ -66,8 +66,7 @@ public class UnitTest1
                         Age = y
                     })
                     .ToList()
-            })
-            .ToList();
+            });
     }
 
     // Given: A set of parents with varying number of children, where all children
@@ -88,8 +87,7 @@ public class UnitTest1
                         Age = age++
                     })
                     .ToList()
-            })
-            .ToList();
+            });
     }
 
     #endregion

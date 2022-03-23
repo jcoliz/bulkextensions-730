@@ -24,8 +24,7 @@ This uses a pair of entities, a Parent which contains multiple Children. See the
                         Age = y
                     })
                     .ToList()
-            })
-            .ToList();
+            });
     }
 
     [TestMethod]
