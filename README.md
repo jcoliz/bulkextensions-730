@@ -113,7 +113,7 @@ A total of 1 test files matched the specified pattern.
   Error Message:
    Assert.AreEqual failed. Expected:<325>. Actual:<25>.
   Stack Trace:
-     at bulkextensions_730.Tests.UnitTest1.BulkAddParentsWithChildren() in C:\Users\JamesColiz\AppData\Local\Temp\bulkextensions-730\Tests\UnitTest1.cs:line 172
+     at bulkextensions_730.Tests.UnitTest1.BulkAddParentsWithChildren() in bulkextensions-730\Tests\UnitTest1.cs:line 172
 
 Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1, Duration: 1 s - bulkextensions-730.dll (net6.0)
 ```
