@@ -14,7 +14,6 @@ public class UnitTest1
 {
     #region Fields
 
-    private SqliteConnection connection;
     private ApplicationDbContext context;
 
     #endregion
@@ -24,14 +23,12 @@ public class UnitTest1
     [TestInitialize]
     public async Task Setup()
     {
-        connection = new SqliteConnection("DataSource=:memory:");
-        connection.Open();
-
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlite(connection)
+            .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=bulkextensions730;Trusted_Connection=True;")
             .Options;
 
         context = new ApplicationDbContext(options);
+        await context.Database.EnsureDeletedAsync();
         await context.Database.EnsureCreatedAsync();
     }
 
@@ -40,8 +37,6 @@ public class UnitTest1
     {
         if (context != null)
             context.Dispose();
-        if (connection != null)
-            connection.Dispose();
     }
 
     #endregion
@@ -54,7 +49,8 @@ public class UnitTest1
         return  Enumerable.Range(1,count).Select(x => new Parent() { Name = x.ToString() });
     }
 
-    // Given: A set of parents with varying number of children
+    // Given: A set of parents with varying number of children, where some children
+    // are equal to other children 
     private IEnumerable<Parent> GivenParentsWithChildren(int count)
     {
         return Enumerable
@@ -70,7 +66,30 @@ public class UnitTest1
                         Age = y
                     })
                     .ToList()
-            });
+            })
+            .ToList();
+    }
+
+    // Given: A set of parents with varying number of children, where all children
+    // are completely unique 
+    private IEnumerable<Parent> GivenParentsWithUniqueChildren(int count)
+    {
+        int age = 1;
+        return Enumerable
+            .Range(1,count)
+            .Select(x => new Parent() 
+            { 
+                Name = x.ToString(),
+                Children = Enumerable
+                    .Range(1,x)
+                    .Select(y => new Child() 
+                    { 
+                        Name = y.ToString(), 
+                        Age = age++
+                    })
+                    .ToList()
+            })
+            .ToList();
     }
 
     #endregion
@@ -135,9 +154,31 @@ public class UnitTest1
     [TestMethod]
     public void BulkAddParentsWithChildren()
     {
-        // Given: A set of parents with varying number of children
+        // Given: A set of parents with varying number of children, where some children
+        // are equal to other children 
         var count = 25;
         var parents = GivenParentsWithChildren(count).ToList();
+        var numchildren = parents.Sum(x=>x.Children.Count);
+
+        // When: Adding them to the database (using bulk extensions)
+        context.BulkInsert(parents,b => b.IncludeGraph = true);
+
+        // Then: They are in the database
+        var actual = context.Set<Parent>().Count();
+        Assert.AreEqual(count,actual);
+
+        // And: The children are separately in the database as well
+        var childrencount = context.Set<Child>().Count();
+        Assert.AreEqual(numchildren,childrencount);
+    }
+
+    [TestMethod]
+    public void BulkAddParentsWithUniqueChildren()
+    {
+        // Given: A set of parents with varying number of children, where some children
+        // are equal to other children 
+        var count = 25;
+        var parents = GivenParentsWithUniqueChildren(count).ToList();
         var numchildren = parents.Sum(x=>x.Children.Count);
 
         // When: Adding them to the database (using bulk extensions)
