@@ -69,6 +69,34 @@ public class UnitTest1
             });
     }
 
+    // Given: A set of parents with varying number of children, where some children
+    // are equal to other children, and where the children have a link to their
+    // parents
+    private IEnumerable<Parent> GivenParentsWithChildrenBacklinked(int count)
+    {
+        return Enumerable
+            .Range(1,count)
+            .Select(x =>
+            {
+                var p = new Parent() 
+                { 
+                    Name = x.ToString(),
+                };
+
+                p.Children = Enumerable
+                    .Range(1,x)
+                    .Select(y => new Child() 
+                    { 
+                        Name = y.ToString(), 
+                        Age = y,
+                        Parent = p
+                    })
+                    .ToList();
+
+                return p; 
+            });
+    }
+
     // Given: A set of parents with varying number of children, where all children
     // are completely unique 
     private IEnumerable<Parent> GivenParentsWithUniqueChildren(int count)
@@ -190,6 +218,64 @@ public class UnitTest1
         var childrencount = context.Set<Child>().Count();
         Assert.AreEqual(numchildren,childrencount);
     }
+
+    [TestMethod, Priority(1)]
+    public void BulkAddParentsWithChildrenSeparately()
+    {
+        // Given: A set of parents with varying number of children, where some children
+        // are equal to other children, and where the children have a link to their
+        // parents
+        var count = 25;
+        var parents = GivenParentsWithChildrenBacklinked(count).ToList();
+        var numchildren = parents.Sum(x=>x.Children.Count);
+
+        // When: Adding the parents to the database (using bulk extensions, asking for identities to be set)
+        // Note that we need the identities set for the next stage
+        context.BulkInsert(parents,b => { b.SetOutputIdentity = true; });
+
+        // And: Populating the children with their parents' ID
+        foreach(var child in parents.SelectMany(x=>x.Children))
+            child.ParentID = child.Parent.ID;
+
+        // And: Adding the children to the database
+        context.BulkInsert(parents.SelectMany(x=>x.Children).ToList());
+
+        // Then: The parents are in the database
+        var actual = context.Set<Parent>().Count();
+        Assert.AreEqual(count,actual);
+
+        // And: The children are separately in the database as well
+        var childrencount = context.Set<Child>().Count();
+        Assert.AreEqual(numchildren,childrencount);
+
+        // And: Getting a parent includes its children
+        var index = 13;
+        var found = context.Set<Parent>().Include(x=>x.Children).Where(x=>x.Name == index.ToString()).AsNoTracking().ToList();
+        Assert.AreEqual(1,found.Count);
+        Assert.AreEqual(index,found.Single().Children.Count);
+    }
+
+    [TestMethod, Priority(1)]
+    public void AddParentsViaBulk()
+    {
+        // Given: A set of parents
+        var count = 25;
+        var parents = GivenParents(count).ToList();
+
+        // When: Adding the parents to the database (using bulk extensions, asking for identities to be set)
+        context.BulkInsert(parents,b => { b.SetOutputIdentity = true; });
+
+        // Then: The parents are in the database
+        var actual = context.Set<Parent>().Count();
+        Assert.AreEqual(count,actual);
+
+        // And: The IDs are populated correctly
+        var index = 13;
+        var populatedid = parents.Where(x=>x.Name == index.ToString()).Single().ID;
+        var dbid = context.Set<Parent>().Where(x=>x.Name == index.ToString()).Single().ID;
+        Assert.AreEqual(dbid,populatedid);
+    }
+
 
     #endregion
 }

@@ -70,6 +70,78 @@ work successfully. See the "BulkAddParentsWithUniqueChildren" test.
 
 Also, inserting the parents with non-unique children using EFCore's DbSet.AddRange works correctly. See the "AddParentsWithChildren" test.
 
+### Workaround: Bulk insert the parents and children separately
+
+The workaround I'm using now is to separately add the parents and children as two separate
+bulk insert operations. This requires that the children have their parent ID set at the time
+of insert, so it requires a coding step in between
+
+First, we construct the data slightly differently, such that the child has a link up to its parent
+
+```c#
+    // Given: A set of parents with varying number of children, where some children
+    // are equal to other children, and where the children have a link to their
+    // parents
+    private IEnumerable<Parent> GivenParentsWithChildrenBacklinked(int count)
+    {
+        return Enumerable
+            .Range(1,count)
+            .Select(x =>
+            {
+                var p = new Parent() 
+                { 
+                    Name = x.ToString(),
+                };
+
+                p.Children = Enumerable
+                    .Range(1,x)
+                    .Select(y => new Child() 
+                    { 
+                        Name = y.ToString(), 
+                        Age = y,
+                        Parent = p
+                    })
+                    .ToList();
+
+                return p; 
+            });
+    }
+```
+
+Insert the parents with SetOutputIdentity:
+
+```c#
+        // When: Adding the parents to the database (using bulk extensions, asking for identities to be set)
+        // Note that we need the identities set for the next stage
+        context.BulkInsert(parents,b => { b.SetOutputIdentity = true; });
+```
+
+Set the parent ID's on each child:
+
+```c#
+        // And: Populating the children with their parents' ID
+        foreach(var child in parents.SelectMany(x=>x.Children))
+            child.ParentID = child.Parent.ID;
+```
+
+Then, finally insert the children as well:
+
+```c#
+        // And: Adding the children to the database
+        context.BulkInsert(parents.SelectMany(x=>x.Children).ToList());
+```
+
+See in in action with the "BulkAddParentsWithChildrenSeparately" test.
+
+```Powershell
+PS bulkextensions-730> dotnet test --filter BulkAddParentsWithChildrenSeparately
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 1 s - bulkextensions-730.dll (net6.0)
+```
+
 ## Using the repro
 
 ### Clone it
