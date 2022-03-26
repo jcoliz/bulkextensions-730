@@ -118,6 +118,24 @@ public class UnitTest1
             });
     }
 
+    // Given: A set of parents with varying number of pets
+    private IEnumerable<Parent> GivenParentsWithPets(int count)
+    {
+        return Enumerable
+            .Range(1,count)
+            .Select(x => new Parent() 
+            { 
+                Name = x.ToString(),
+                Pets = Enumerable
+                    .Range(1,x)
+                    .Select(y => new Pet() 
+                    { 
+                        Name = y.ToString(), 
+                    })
+                    .ToList()
+            });
+    }
+
     #endregion
 
     #region Tests
@@ -196,6 +214,27 @@ public class UnitTest1
         // And: The children are separately in the database as well
         var childrencount = context.Set<Child>().Count();
         Assert.AreEqual(numchildren,childrencount);
+    }
+
+    [TestMethod, Priority(1)]
+    public void BulkAddParentsWithPets()
+    {
+        // Given: A set of parents with varying number of children, where some children
+        // are equal to other children 
+        var count = 25;
+        var parents = GivenParentsWithPets(count).ToList();
+        var numpets = parents.Sum(x=>x.Pets.Count);
+
+        // When: Adding the parents to the database (using bulk extensions)
+        context.BulkInsert(parents,b => b.IncludeGraph = true);
+
+        // Then: The parents are in the database
+        var actual = context.Set<Parent>().Count();
+        Assert.AreEqual(count,actual);
+
+        // And: The pets are separately in the database as well
+        var petscount = context.Set<Pet>().Count();
+        Assert.AreEqual(numpets,petscount);
     }
 
     [TestMethod, Priority(1)]

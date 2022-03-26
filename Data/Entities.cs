@@ -10,6 +10,8 @@ public class Parent
     public string Name { get; set; }
 
     public ICollection<Child> Children { get; set; }
+
+    public ICollection<Pet> Pets { get; set; }
 }
 
 public class Child
@@ -35,4 +37,11 @@ public class Child
     {
         return HashCode.Combine(Name, Age);
     }
+}
+
+public class Pet
+{
+    public int ID { get; set; }
+
+    public string Name { get; set; }
 }
