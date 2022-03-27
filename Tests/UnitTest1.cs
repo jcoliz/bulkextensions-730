@@ -205,7 +205,7 @@ public class UnitTest1
         var numchildren = parents.Sum(x=>x.Children.Count);
 
         // When: Adding the parents to the database (using bulk extensions)
-        context.BulkInsert(parents,b => b.IncludeGraph = true);
+        context.BulkInsert(parents,b => { b.IncludeGraph = true; b.OmitClauseExistsExcept = true; });
 
         // Then: The parents are in the database
         var actual = context.Set<Parent>().Count();
@@ -226,7 +226,7 @@ public class UnitTest1
         var numpets = parents.Sum(x=>x.Pets.Count);
 
         // When: Adding the parents to the database (using bulk extensions)
-        context.BulkInsert(parents,b => b.IncludeGraph = true);
+        context.BulkInsert(parents,b => { b.IncludeGraph = true; b.OmitClauseExistsExcept = true; });
 
         // Then: The parents are in the database
         var actual = context.Set<Parent>().Count();
