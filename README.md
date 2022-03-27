@@ -1,6 +1,6 @@
 # BulkInsertAsync with IncludeGraph does not insert multiple equal subentities
 
-This is a repro for [Issue #730](https://github.com/borisdj/EFCore.BulkExtensions/issues/780) on [EFCore.BulkExtensions](https://github.com/borisdj/EFCore.BulkExtensions)
+This is a repro for [Issue #780](https://github.com/borisdj/EFCore.BulkExtensions/issues/780) on [EFCore.BulkExtensions](https://github.com/borisdj/EFCore.BulkExtensions). (Sorry for any confusion, I dyslexically named this repo "730" when it should have been "780".)
 
 [![Build](https://github.com/jcoliz/bulkextensions-730/actions/workflows/build.yml/badge.svg)](https://github.com/jcoliz/bulkextensions-730/actions/workflows/build.yml)
 
